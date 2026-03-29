@@ -120,7 +120,14 @@ fun TVSetupScreen(onConfigured: () -> Unit) {
                         error = null
                     },
                     label = { Text("ID džemata", color = Color(0xFFB7E4C7)) },
-                    placeholder = { Text("npr. masline", color = Color(0xFF74C69D)) },
+                    placeholder = { Text("npr. dzemat123", color = Color(0xFF74C69D)) },
+                    supportingText = {
+                        Text(
+                            "ID dobijate od administratora sistema pri postavljanju.",
+                            color = Color(0xFF74C69D),
+                            fontSize = 13.sp
+                        )
+                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
                     colors = OutlinedTextFieldDefaults.colors(
