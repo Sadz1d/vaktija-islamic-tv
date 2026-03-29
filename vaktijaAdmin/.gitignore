@@ -1,0 +1,70 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+# ============================================
+# FIREBASE - NEVER COMMIT
+# ============================================
+google-services.json
+firebase-debug.log
+firebase-debug.*.log
+
+# ============================================
+# SECRETS & CREDENTIALS - NEVER COMMIT
+# ============================================
+secrets.properties
+customer-config.properties
+*.jks
+*.keystore
+key.properties
+release-signing.properties
+
+# API Keys
+local.properties
+
+# ============================================
+# BUILD FILES - GENERATED
+# ============================================
+*.apk
+*.aab
+*.ap_
+*.dex
+build/
+*/build/
+.gradle/
+gradle-app.setting
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ============================================
+# IDE - ANDROID STUDIO
+# ============================================
+.idea/
+*.iml
+.DS_Store
+.navigation/
+*.hprof
+output.json
+
+# ============================================
+# MISC
+# ============================================
+bin/
+gen/
+out/
+release/
+proguard/
+vaktijaAdmin.zip
+*.zip
