@@ -1,10 +1,10 @@
-#  Vaktija TV — Islamic Prayer Times Display System
+# Vaktija TV — Islamic Prayer Times Display System
 
 A two-app Android system for displaying Islamic prayer times and announcements on mosque TV screens. Built with **Kotlin**, **Jetpack Compose**, and **Firebase**.
 
 ---
 
-##  Apps
+## Apps
 
 ### Vaktija TV (Display App)
 Designed for Android TV screens or tablets mounted in mosques. Shows:
@@ -22,7 +22,7 @@ A phone app for mosque administrators to manage announcements:
 
 ---
 
-##  Architecture
+## Architecture
 
 ```
 Firebase Realtime Database
@@ -42,7 +42,7 @@ admins/
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -52,12 +52,12 @@ admins/
 | Database | Firebase Realtime Database |
 | Image hosting | Cloudinary (unsigned upload preset) |
 | Image loading | Coil |
-| Prayer times | Vaktija.eu REST API |
+| Prayer times | Vaktija.ba REST API |
 | Architecture | ViewModel + StateFlow |
 
 ---
 
-##  Setup
+## Setup
 
 ### Prerequisites
 - Android Studio Hedgehog or newer
@@ -66,8 +66,8 @@ admins/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/vaktija-tv.git
-cd vaktija-tv
+git clone https://github.com/Sadz1d/vaktija-islamic-tv.git
+cd vaktija-islamic-tv
 ```
 
 ### 2. Firebase setup
@@ -136,7 +136,7 @@ Open each project folder in Android Studio and run on your target device.
 
 ---
 
-##  Firebase Rules Explained
+## Firebase Rules Explained
 
 - **TV app** can read content for its mosque (public read)
 - **Admin app** can only write to the mosque linked to their account
@@ -145,32 +145,32 @@ Open each project folder in Android Studio and run on your target device.
 
 ---
 
-##  TV App — First Launch
+## TV App — First Launch
 
 On first launch, the TV app shows a one-time setup screen asking for the **mosque ID** (e.g. `masline`). This is saved locally and never asked again. The mosque ID must match the one configured in Firebase under `/dzamije/{dzamijaId}`.
 
 ---
 
-##  Screenshots
+## Screenshots
 
 *Coming soon*
 
 ---
 
-##  Contributing
-
-This project was built for real-world use in local mosques. If you'd like to adapt it for your community, feel free to fork it. Pull requests are welcome.
-
----
-
-##  License
-
-MIT License — free to use, modify and distribute.
-
----
-
-##  Author
+## Author
 
 Built by [Sadžid Marić](https://github.com/Sadz1d)
 
 > If you find this useful for your mosque, a ⭐ on GitHub is appreciated!
+
+---
+
+## License
+
+© 2026 Sadžid Marić. All Rights Reserved.
+
+This project is source-available for portfolio and educational purposes only.
+Unauthorized copying, redistribution, or commercial use without explicit written
+permission from the author is strictly prohibited.
+
+For licensing inquiries: maricsadzid@gmail.com
