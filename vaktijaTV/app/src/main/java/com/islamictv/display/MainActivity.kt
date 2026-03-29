@@ -335,12 +335,15 @@ fun PrayerTimeRow(
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = verticalPadding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = if (showCountdown) Alignment.Top else Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = if (showCountdown) Modifier.padding(top = 4.dp) else Modifier,
+                //modifier = if (showCountdown) Modifier.padding(top = 4.dp) else Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(prayer.arabicName, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -349,7 +352,7 @@ fun PrayerTimeRow(
             }
             Column(
                 horizontalAlignment = Alignment.End,
-                modifier = if (showCountdown) Modifier.padding(top = 2.dp) else Modifier
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(prayer.time, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFE66D))
                 if (showCountdown) {
