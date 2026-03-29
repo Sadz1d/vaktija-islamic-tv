@@ -1,0 +1,52 @@
+# ============================================
+# FIREBASE - NEVER COMMIT
+# ============================================
+google-services.json
+firebase-debug.log
+firebase-debug.*.log
+
+# ============================================
+# SECRETS & CREDENTIALS - NEVER COMMIT
+# ============================================
+secrets.properties
+*.jks
+*.keystore
+key.properties
+release-signing.properties
+local.properties
+
+# ============================================
+# BUILD FILES
+# ============================================
+*.apk
+*.aab
+*.ap_
+*.dex
+build/
+*/build/
+.gradle/
+*/.gradle/
+gradle-app.setting
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ============================================
+# IDE
+# ============================================
+.idea/
+*.iml
+.DS_Store
+.navigation/
+*.hprof
+output.json
+
+# ============================================
+# MISC
+# ============================================
+bin/
+gen/
+out/
+release/
+proguard/
+*.zip
