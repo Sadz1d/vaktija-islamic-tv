@@ -1,0 +1,35 @@
+# Privacy Policy — Vaktija TV System
+
+**Last updated: April 1, 2026**
+**Contact: maricsadzid@gmail.com**
+
+## Overview
+Vaktija TV is a two-app system (TV display + Admin app) for displaying 
+Islamic prayer times and announcements in mosques.
+
+## Data We Collect
+
+### Admin App
+- **Email address** — used for Firebase Authentication login only
+- **Images** — uploaded by admins and stored on Cloudinary
+
+### TV App
+- **No personal data collected** — the TV app only reads and displays data
+
+## How We Use Data
+- Email is used solely for authentication purposes
+- Images are used solely for displaying mosque announcements
+- No data is sold or shared with third parties
+
+## Data Storage
+- Authentication data is stored securely by Google Firebase
+- Images are stored securely by Cloudinary
+- No data is stored locally except the mosque ID on the TV device
+
+## Third Party Services
+- [Google Firebase](https://firebase.google.com/support/privacy)
+- [Cloudinary](https://cloudinary.com/privacy)
+
+## Contact
+For any questions regarding this privacy policy:
+maricsadzid@gmail.com
