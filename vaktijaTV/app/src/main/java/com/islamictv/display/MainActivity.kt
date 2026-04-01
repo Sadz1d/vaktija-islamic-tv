@@ -205,6 +205,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
     var nextPrayer by remember { mutableStateOf<PrayerTime?>(null) }
     var countdownText by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
+    val isFullscreen=isFullScreen
 
     LaunchedEffect(prayerTimes) {
         if (prayerTimes.isEmpty()) return@LaunchedEffect
@@ -306,7 +307,8 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
                                 prayer = prayer,
                                 showCountdown = prayer == nextPrayer,
                                 countdownText = countdownText,
-                                modifier = Modifier.weight(1f).fillMaxHeight()
+                                modifier = Modifier.weight(1f).fillMaxHeight(),
+                                isFullScreen = isFullscreen
                             )
                         }
                         if (rowPrayers.size == 1) Spacer(modifier = Modifier.weight(1f))
@@ -319,7 +321,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 prayerTimes.forEach { prayer ->
-                    PrayerTimeRow(prayer = prayer, showCountdown = prayer == nextPrayer, countdownText = countdownText)
+                    PrayerTimeRow(prayer = prayer, showCountdown = prayer == nextPrayer, countdownText = countdownText,isFullScreen = isFullscreen)
                 }
             }
         }
@@ -331,7 +333,8 @@ fun PrayerTimeRow(
     prayer: PrayerTime,
     showCountdown: Boolean,
     countdownText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFullScreen: Boolean
 ) {
     val backgroundColor = if (showCountdown) Color(0xFF38A169) else Color(0xFF40916C)
     val borderColor = if (showCountdown) Color(0xFF276749) else Color.Transparent
@@ -361,9 +364,9 @@ fun PrayerTimeRow(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(prayer.time, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFE66D))
+                Text(prayer.time, fontSize = if (isFullScreen) 36.sp else 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFE66D))
                 if (showCountdown) {
-                    Text(countdownText, fontSize = 18.sp, color = Color(0xFFFFE66D))
+                    Text(countdownText, fontSize = if (isFullScreen) 24.sp else 18.sp, color = Color(0xFFFFE66D))
                 }
             }
         }
