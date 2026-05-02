@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -50,45 +51,136 @@ class MainActivity : ComponentActivity(), ImageLoaderFactory {
     }
 }
 
-/**
- * Root composable:
- * - Shows setup screen on first launch (enter džemat ID once)
- * - Shows main display after that
- */
-@Composable
-fun TVApp() {
-    val context = LocalContext.current
-    var isConfigured by remember { mutableStateOf(TVDzamatConfig.isConfigured(context)) }
+// ---------------------------------------------------------------------------
+// Detekcija rezolucije
+// ---------------------------------------------------------------------------
 
-    if (!isConfigured) {
-        TVSetupScreen(
-            onConfigured = { isConfigured = true }
-        )
-    } else {
-        SplitScreenDisplay()
+enum class ScreenClass { TV_4K, TV_1080P, TV_720P }
+
+@Composable
+fun rememberScreenClass(): ScreenClass {
+    val configuration = LocalConfiguration.current
+    val widthDp = configuration.screenWidthDp
+    return remember(widthDp) {
+        when {
+            widthDp >= 960 -> ScreenClass.TV_4K
+            widthDp >= 600 -> ScreenClass.TV_1080P
+            else -> ScreenClass.TV_720P
+        }
     }
 }
 
-/**
- * One-time setup screen shown only on first launch.
- * Admin enters the džemat ID (e.g. "masline") and it's saved locally.
- */
+// ---------------------------------------------------------------------------
+// Dimenzije po rezoluciji
+// ---------------------------------------------------------------------------
+
+data class TVDimensions(
+    val arabicTitleSp: Int,
+    val cityTitleSp: Int,
+    val clockSp: Int,
+    val dateSp: Int,
+    val prayerArabicSp: Int,
+    val prayerBosnianSp: Int,
+    val prayerTimeSp: Int,
+    val prayerTimeFullSp: Int,
+    val countdownSp: Int,
+    val countdownFullSp: Int,
+    val loadingTextSp: Int,
+    val setupTitleSp: Int,
+    val setupBodySp: Int,
+    val panelPaddingDp: Int,
+    val cardSpacingDp: Int,
+    val cardPaddingHDp: Int,
+    val cardPaddingVDp: Int,
+    val headerSpacerDp: Int,
+    val scrollCardMaxHeightDp: Int,
+    val arabicScrollSp: Int,
+    val arabicScrollLineSp: Int,
+    val bosnianScrollSp: Int,
+    val bosnianScrollLineSp: Int
+)
+
+fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
+    ScreenClass.TV_4K -> TVDimensions(
+        arabicTitleSp = 36, cityTitleSp = 28, clockSp = 60, dateSp = 25,
+        prayerArabicSp = 26, prayerBosnianSp = 24,
+        prayerTimeSp = 28, prayerTimeFullSp = 36,
+        countdownSp = 18, countdownFullSp = 24,
+        loadingTextSp = 24, setupTitleSp = 28, setupBodySp = 18,
+        panelPaddingDp = 24, cardSpacingDp = 12,
+        cardPaddingHDp = 16, cardPaddingVDp = 10, headerSpacerDp = 24,
+        scrollCardMaxHeightDp = 260,
+        arabicScrollSp = 26, arabicScrollLineSp = 40,
+        bosnianScrollSp = 22, bosnianScrollLineSp = 32
+    )
+    ScreenClass.TV_1080P -> TVDimensions(
+        arabicTitleSp = 22, cityTitleSp = 18, clockSp = 38, dateSp = 16,
+        prayerArabicSp = 17, prayerBosnianSp = 15,
+        prayerTimeSp = 18, prayerTimeFullSp = 22,
+        countdownSp = 12, countdownFullSp = 15,
+        loadingTextSp = 16, setupTitleSp = 20, setupBodySp = 14,
+        panelPaddingDp = 14, cardSpacingDp = 7,
+        cardPaddingHDp = 10, cardPaddingVDp = 6, headerSpacerDp = 14,
+        scrollCardMaxHeightDp = 160,
+        arabicScrollSp = 16, arabicScrollLineSp = 26,
+        bosnianScrollSp = 14, bosnianScrollLineSp = 22
+    )
+    ScreenClass.TV_720P -> TVDimensions(
+        arabicTitleSp = 17, cityTitleSp = 14, clockSp = 28, dateSp = 13,
+        prayerArabicSp = 13, prayerBosnianSp = 12,
+        prayerTimeSp = 14, prayerTimeFullSp = 17,
+        countdownSp = 10, countdownFullSp = 12,
+        loadingTextSp = 13, setupTitleSp = 16, setupBodySp = 12,
+        panelPaddingDp = 10, cardSpacingDp = 5,
+        cardPaddingHDp = 8, cardPaddingVDp = 4, headerSpacerDp = 10,
+        scrollCardMaxHeightDp = 110,
+        arabicScrollSp = 13, arabicScrollLineSp = 20,
+        bosnianScrollSp = 11, bosnianScrollLineSp = 17
+    )
+}
+
+val LocalTVDimensions = compositionLocalOf { dimensionsFor(ScreenClass.TV_4K) }
+
+// ---------------------------------------------------------------------------
+// Root composable
+// ---------------------------------------------------------------------------
+
+@Composable
+fun TVApp() {
+    val context = LocalContext.current
+    val screenClass = rememberScreenClass()
+    val dims = remember(screenClass) { dimensionsFor(screenClass) }
+
+    var isConfigured by remember { mutableStateOf(TVDzamatConfig.isConfigured(context)) }
+
+    Log.d("ScreenClass", "Detected: $screenClass (clockSp=${dims.clockSp})")
+
+    CompositionLocalProvider(LocalTVDimensions provides dims) {
+        if (!isConfigured) {
+            TVSetupScreen(onConfigured = { isConfigured = true })
+        } else {
+            SplitScreenDisplay()
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Setup screen
+// ---------------------------------------------------------------------------
+
 @Composable
 fun TVSetupScreen(onConfigured: () -> Unit) {
     val context = LocalContext.current
+    val dims = LocalTVDimensions.current
     var dzamijaId by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B4332)),
+        modifier = Modifier.fillMaxSize().background(Color(0xFF1B4332)),
         contentAlignment = Alignment.Center
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(0.5f).padding(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF2D6A4F))
         ) {
             Column(
@@ -98,94 +190,69 @@ fun TVSetupScreen(onConfigured: () -> Unit) {
             ) {
                 Text(
                     "Postavljanje TV ekrana",
-                    fontSize = 28.sp,
+                    fontSize = dims.setupTitleSp.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center
                 )
-
                 Text(
                     "Unesite ID vašeg džemata.\nOvo se radi samo jednom.",
-                    fontSize = 18.sp,
+                    fontSize = dims.setupBodySp.sp,
                     color = Color(0xFFB7E4C7),
                     textAlign = TextAlign.Center
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 OutlinedTextField(
                     value = dzamijaId,
-                    onValueChange = {
-                        dzamijaId = it
-                        error = null
-                    },
+                    onValueChange = { dzamijaId = it; error = null },
                     label = { Text("ID džemata", color = Color(0xFFB7E4C7)) },
                     placeholder = { Text("npr. dzemat123", color = Color(0xFF74C69D)) },
                     supportingText = {
                         Text(
                             "ID dobijate od administratora sistema pri postavljanju.",
-                            color = Color(0xFF74C69D),
-                            fontSize = 13.sp
+                            color = Color(0xFF74C69D), fontSize = 13.sp
                         )
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF74C69D),
-                        unfocusedBorderColor = Color(0xFF40916C)
+                        focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color(0xFF74C69D), unfocusedBorderColor = Color(0xFF40916C)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                if (error != null) {
-                    Text(error!!, color = Color(0xFFFFE66D), fontSize = 14.sp)
-                }
-
+                if (error != null) Text(error!!, color = Color(0xFFFFE66D), fontSize = 14.sp)
                 Button(
                     onClick = {
-                        if (dzamijaId.isBlank()) {
-                            error = "ID džemata ne može biti prazan"
-                        } else {
-                            TVDzamatConfig.saveDzamijaId(context, dzamijaId)
-                            onConfigured()
-                        }
+                        if (dzamijaId.isBlank()) error = "ID džemata ne može biti prazan"
+                        else { TVDzamatConfig.saveDzamijaId(context, dzamijaId); onConfigured() }
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF40916C)
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF40916C)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Potvrdi", fontSize = 18.sp, color = Color.White)
+                    Text("Potvrdi", fontSize = dims.setupBodySp.sp, color = Color.White)
                 }
             }
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// Split screen
+// ---------------------------------------------------------------------------
+
 @Composable
 fun SplitScreenDisplay() {
-    val context = LocalContext.current
     var hasContent by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B4332))
-    ) {
+    Row(modifier = Modifier.fillMaxSize().background(Color(0xFF1B4332))) {
         PrayerTimesPanel(
-            modifier = Modifier
-                .weight(if (hasContent) 1f else 2f)
-                .fillMaxHeight(),
+            modifier = Modifier.weight(if (hasContent) 1f else 2f).fillMaxHeight(),
             isFullScreen = !hasContent
         )
-
         if (hasContent) {
             IslamicContentPanel(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 onContentAvailable = { available -> hasContent = available }
             )
         } else {
@@ -197,15 +264,19 @@ fun SplitScreenDisplay() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Prayer times panel
+// ---------------------------------------------------------------------------
+
 @Composable
 fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = false) {
+    val dims = LocalTVDimensions.current
     var currentTime by remember { mutableStateOf(getCurrentTime()) }
     var currentDate by remember { mutableStateOf(getCurrentDateBosnian()) }
     var prayerTimes by remember { mutableStateOf<List<PrayerTime>>(emptyList()) }
     var nextPrayer by remember { mutableStateOf<PrayerTime?>(null) }
     var countdownText by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
-    val isFullscreen=isFullScreen
 
     LaunchedEffect(prayerTimes) {
         if (prayerTimes.isEmpty()) return@LaunchedEffect
@@ -213,7 +284,6 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
             val now = Calendar.getInstance()
             val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
             var foundNext: PrayerTime? = null
-
             for (i in prayerTimes.indices) {
                 val current = prayerTimes[i]
                 val next = if (i < prayerTimes.size - 1) prayerTimes[i + 1] else prayerTimes[0]
@@ -221,9 +291,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
                 val nextMinutes = getTimeInMinutes(next.time)
                 val isCurrentPrayer = if (nextMinutes > prayerMinutes) {
                     currentMinutes >= prayerMinutes && currentMinutes < nextMinutes
-                } else {
-                    currentMinutes < nextMinutes
-                }
+                } else { currentMinutes < nextMinutes }
                 if (isCurrentPrayer) {
                     foundNext = next
                     val remainingMinutes = nextMinutes - currentMinutes
@@ -247,7 +315,6 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
                 set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
             }.timeInMillis
-
             if (lastSuccessfulFetch < todayMidnight) {
                 try {
                     val newTimes = api.fetchPrayerTimes()
@@ -256,20 +323,14 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
                         lastSuccessfulFetch = System.currentTimeMillis()
                         Log.d("PrayerTimes", "✅ API SUCCESS!! Times updated")
                     }
-                } catch (e: Exception) {
-                    Log.e("PrayerTimes", "❌ Exception: ${e.message}")
-                }
+                } catch (e: Exception) { Log.e("PrayerTimes", "❌ Exception: ${e.message}") }
             }
             delay(30_000L)
         }
     }
 
     LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            currentTime = getCurrentTime()
-            currentDate = getCurrentDateBosnian()
-        }
+        while (true) { delay(1000); currentTime = getCurrentTime(); currentDate = getCurrentDateBosnian() }
     }
 
     LaunchedEffect(Unit) {
@@ -283,32 +344,38 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
         }
     }
 
-    Column(modifier = modifier.background(Color(0xFF2D6A4F)).padding(24.dp)) {
+    Column(modifier = modifier.background(Color(0xFF2D6A4F)).padding(dims.panelPaddingDp.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Text("مواقيت الصلاة", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text("Vaktija - Mostar", fontSize = 28.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
-            Text(currentTime, fontSize = 60.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
-            Text(currentDate, fontSize = 25.sp, color = Color(0xFFB7E4C7))
+            Text("مواقيت الصلاة", fontSize = dims.arabicTitleSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Vaktija - Mostar", fontSize = dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
+            Text(currentTime, fontSize = dims.clockSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
+            Text(currentDate, fontSize = dims.dateSp.sp, color = Color(0xFFB7E4C7))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(dims.headerSpacerDp.dp))
 
         if (prayerTimes.isEmpty()) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Učitavanje vaktije...", fontSize = 24.sp, color = Color(0xFFFFE66D))
+                Text("Učitavanje vaktije...", fontSize = dims.loadingTextSp.sp, color = Color(0xFFFFE66D))
             }
         } else if (isFullScreen) {
-            Column(modifier = Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                verticalArrangement = Arrangement.spacedBy(dims.cardSpacingDp.dp)
+            ) {
                 val rows = prayerTimes.chunked(2)
                 rows.forEach { rowPrayers ->
-                    Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(dims.cardSpacingDp.dp)
+                    ) {
                         rowPrayers.forEach { prayer ->
                             PrayerTimeRow(
                                 prayer = prayer,
                                 showCountdown = prayer == nextPrayer,
                                 countdownText = countdownText,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                                isFullScreen = isFullscreen
+                                isFullScreen = true
                             )
                         }
                         if (rowPrayers.size == 1) Spacer(modifier = Modifier.weight(1f))
@@ -318,15 +385,24 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
         } else {
             Column(
                 modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(dims.cardSpacingDp.dp)
             ) {
                 prayerTimes.forEach { prayer ->
-                    PrayerTimeRow(prayer = prayer, showCountdown = prayer == nextPrayer, countdownText = countdownText,isFullScreen = isFullscreen)
+                    PrayerTimeRow(
+                        prayer = prayer,
+                        showCountdown = prayer == nextPrayer,
+                        countdownText = countdownText,
+                        isFullScreen = false
+                    )
                 }
             }
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Prayer time row
+// ---------------------------------------------------------------------------
 
 @Composable
 fun PrayerTimeRow(
@@ -336,9 +412,9 @@ fun PrayerTimeRow(
     modifier: Modifier = Modifier,
     isFullScreen: Boolean
 ) {
+    val dims = LocalTVDimensions.current
     val backgroundColor = if (showCountdown) Color(0xFF38A169) else Color(0xFF40916C)
     val borderColor = if (showCountdown) Color(0xFF276749) else Color.Transparent
-    val verticalPadding = if (showCountdown) 8.dp else 16.dp
 
     Card(
         modifier = modifier.fillMaxWidth().border(3.dp, borderColor, MaterialTheme.shapes.medium),
@@ -346,32 +422,38 @@ fun PrayerTimeRow(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .fillMaxWidth().fillMaxHeight()
+                .padding(horizontal = dims.cardPaddingHDp.dp, vertical = dims.cardPaddingVDp.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                //modifier = if (showCountdown) Modifier.padding(top = 4.dp) else Modifier,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(prayer.arabicName, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Text("  |  ", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
-                Text(prayer.bosnianName, fontSize = 24.sp, color = Color(0xFFD8F3DC))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(prayer.arabicName, fontSize = dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("  |  ", fontSize = dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
+                Text(prayer.bosnianName, fontSize = dims.prayerBosnianSp.sp, color = Color(0xFFD8F3DC))
             }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(prayer.time, fontSize = if (isFullScreen) 36.sp else 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFE66D))
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
+                Text(
+                    prayer.time,
+                    fontSize = if (isFullScreen) dims.prayerTimeFullSp.sp else dims.prayerTimeSp.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFFE66D)
+                )
                 if (showCountdown) {
-                    Text(countdownText, fontSize = if (isFullScreen) 24.sp else 18.sp, color = Color(0xFFFFE66D))
+                    Text(
+                        countdownText,
+                        fontSize = if (isFullScreen) dims.countdownFullSp.sp else dims.countdownSp.sp,
+                        color = Color(0xFFFFE66D)
+                    )
                 }
             }
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Islamic content panel
+// ---------------------------------------------------------------------------
 
 @Composable
 fun IslamicContentPanel(
@@ -379,12 +461,12 @@ fun IslamicContentPanel(
     onContentAvailable: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val dims = LocalTVDimensions.current
     var currentIndex by remember { mutableStateOf(0) }
     var contentItems by remember { mutableStateOf<List<ContentItem>>(emptyList()) }
-    LaunchedEffect(contentItems) {
-        currentIndex = 0
-    }
-    // Get the džemat ID saved during setup
+
+    LaunchedEffect(contentItems) { currentIndex = 0 }
+
     val dzamijaId = remember { TVDzamatConfig.getDzamijaId(context) ?: "" }
     val firebaseManager = remember { FirebaseContentManager(dzamijaId) }
 
@@ -408,10 +490,13 @@ fun IslamicContentPanel(
     }
 
     if (contentItems.isEmpty()) return
-
     val currentContent = contentItems.getOrNull(currentIndex) ?: return
+
     Column(modifier = modifier.background(Color(0xFF1B4332)), horizontalAlignment = Alignment.CenterHorizontally) {
-        Column(modifier = Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             if (currentContent.imageUrl.isNotEmpty()) {
                 val displayUrl = currentContent.imageUrl.replace("https://", "http://")
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -428,25 +513,61 @@ fun IslamicContentPanel(
             }
             Column {
                 if (currentContent.arabicText.isNotEmpty()) {
-                    ScrollableTextCard(currentContent.arabicText, 26.sp, 40.sp, Color(0xFF2D6A4F), Color.White)
+                    ScrollableTextCard(
+                        text = currentContent.arabicText,
+                        fontSize = dims.arabicScrollSp.sp,
+                        lineHeight = dims.arabicScrollLineSp.sp,
+                        containerColor = Color(0xFF2D6A4F),
+                        textColor = Color.White,
+                        maxHeightDp = dims.scrollCardMaxHeightDp
+                    )
                 }
                 if (currentContent.bosnianText.isNotEmpty()) {
-                    ScrollableTextCard(currentContent.bosnianText, 22.sp, 32.sp, Color(0xFF40916C), Color(0xFFD8F3DC))
+                    ScrollableTextCard(
+                        text = currentContent.bosnianText,
+                        fontSize = dims.bosnianScrollSp.sp,
+                        lineHeight = dims.bosnianScrollLineSp.sp,
+                        containerColor = Color(0xFF40916C),
+                        textColor = Color(0xFFD8F3DC),
+                        maxHeightDp = dims.scrollCardMaxHeightDp
+                    )
                 }
             }
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// Scrollable text card
+// ---------------------------------------------------------------------------
+
 @Composable
-fun ScrollableTextCard(text: String, fontSize: TextUnit, lineHeight: TextUnit, containerColor: Color, textColor: Color) {
+fun ScrollableTextCard(
+    text: String,
+    fontSize: TextUnit,
+    lineHeight: TextUnit,
+    containerColor: Color,
+    textColor: Color,
+    maxHeightDp: Int = 260
+) {
     val scrollState = rememberScrollState()
-    Card(modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp), colors = CardDefaults.cardColors(containerColor = containerColor)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().heightIn(max = maxHeightDp.dp),
+        colors = CardDefaults.cardColors(containerColor = containerColor)
+    ) {
         Box(modifier = Modifier.padding(24.dp).verticalScroll(scrollState)) {
-            Text(text = text, fontSize = fontSize, lineHeight = lineHeight, textAlign = TextAlign.Center, color = textColor, modifier = Modifier.fillMaxWidth())
+            Text(
+                text = text, fontSize = fontSize, lineHeight = lineHeight,
+                textAlign = TextAlign.Center, color = textColor,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 fun getCurrentTime(): String = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
 
