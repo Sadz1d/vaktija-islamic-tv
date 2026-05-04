@@ -1,5 +1,6 @@
 package com.islamictv.display
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -59,12 +60,14 @@ enum class ScreenClass { TV_4K, TV_1080P, TV_720P }
 
 @Composable
 fun rememberScreenClass(): ScreenClass {
-    val configuration = LocalConfiguration.current
-    val widthDp = configuration.screenWidthDp
-    return remember(widthDp) {
+    val realWidthPx = Resources.getSystem().displayMetrics.widthPixels
+
+    Log.d("ScreenDebug", "REAL widthPx=$realWidthPx")
+
+    return remember(realWidthPx) {
         when {
-            widthDp >= 960 -> ScreenClass.TV_4K
-            widthDp >= 600 -> ScreenClass.TV_1080P
+            realWidthPx >= 3000 -> ScreenClass.TV_4K
+            realWidthPx >= 1800 -> ScreenClass.TV_1080P
             else -> ScreenClass.TV_720P
         }
     }
@@ -114,16 +117,16 @@ fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
         bosnianScrollSp = 22, bosnianScrollLineSp = 32
     )
     ScreenClass.TV_1080P -> TVDimensions(
-        arabicTitleSp = 22, cityTitleSp = 18, clockSp = 38, dateSp = 16,
-        prayerArabicSp = 17, prayerBosnianSp = 15,
-        prayerTimeSp = 18, prayerTimeFullSp = 22,
-        countdownSp = 12, countdownFullSp = 15,
-        loadingTextSp = 16, setupTitleSp = 20, setupBodySp = 14,
-        panelPaddingDp = 14, cardSpacingDp = 7,
-        cardPaddingHDp = 10, cardPaddingVDp = 6, headerSpacerDp = 14,
+        arabicTitleSp = 20, cityTitleSp = 24, clockSp = 48, dateSp = 20,
+        prayerArabicSp = 18, prayerBosnianSp = 16,
+        prayerTimeSp = 22, prayerTimeFullSp = 26,
+        countdownSp = 13, countdownFullSp = 16,
+        loadingTextSp = 17, setupTitleSp = 21, setupBodySp = 15,
+        panelPaddingDp = 15, cardSpacingDp = 8,
+        cardPaddingHDp = 11, cardPaddingVDp = 7, headerSpacerDp = 15,
         scrollCardMaxHeightDp = 160,
-        arabicScrollSp = 16, arabicScrollLineSp = 26,
-        bosnianScrollSp = 14, bosnianScrollLineSp = 22
+        arabicScrollSp = 17, arabicScrollLineSp = 27,
+        bosnianScrollSp = 15, bosnianScrollLineSp = 23
     )
     ScreenClass.TV_720P -> TVDimensions(
         arabicTitleSp = 17, cityTitleSp = 14, clockSp = 28, dateSp = 13,
