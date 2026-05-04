@@ -81,9 +81,12 @@ data class TVDimensions(
     val arabicTitleSp: Int,
     val cityTitleSp: Int,
     val clockSp: Int,
+    val clockFullSp: Int,
     val dateSp: Int,
     val prayerArabicSp: Int,
+    val prayerArabicFullSp: Int,
     val prayerBosnianSp: Int,
+    val prayerBosnianFullSp: Int,
     val prayerTimeSp: Int,
     val prayerTimeFullSp: Int,
     val countdownSp: Int,
@@ -105,8 +108,8 @@ data class TVDimensions(
 
 fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
     ScreenClass.TV_4K -> TVDimensions(
-        arabicTitleSp = 36, cityTitleSp = 28, clockSp = 60, dateSp = 25,
-        prayerArabicSp = 26, prayerBosnianSp = 24,
+        arabicTitleSp = 36, cityTitleSp = 28, clockSp = 60,clockFullSp = 70, dateSp = 25,
+        prayerArabicSp = 26,prayerArabicFullSp = 32, prayerBosnianSp = 24,prayerBosnianFullSp = 30,
         prayerTimeSp = 28, prayerTimeFullSp = 36,
         countdownSp = 18, countdownFullSp = 24,
         loadingTextSp = 24, setupTitleSp = 28, setupBodySp = 18,
@@ -117,10 +120,10 @@ fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
         bosnianScrollSp = 22, bosnianScrollLineSp = 32
     )
     ScreenClass.TV_1080P -> TVDimensions(
-        arabicTitleSp = 20, cityTitleSp = 24, clockSp = 48, dateSp = 20,
-        prayerArabicSp = 18, prayerBosnianSp = 16,
-        prayerTimeSp = 22, prayerTimeFullSp = 26,
-        countdownSp = 13, countdownFullSp = 16,
+        arabicTitleSp = 20, cityTitleSp = 24, clockSp = 48,clockFullSp = 58, dateSp = 20,
+        prayerArabicSp = 18,prayerArabicFullSp = 34, prayerBosnianSp = 16,prayerBosnianFullSp = 22,
+        prayerTimeSp = 22, prayerTimeFullSp = 30,
+        countdownSp = 13, countdownFullSp = 20,
         loadingTextSp = 17, setupTitleSp = 21, setupBodySp = 15,
         panelPaddingDp = 15, cardSpacingDp = 8,
         cardPaddingHDp = 11, cardPaddingVDp = 7, headerSpacerDp = 15,
@@ -129,8 +132,8 @@ fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
         bosnianScrollSp = 15, bosnianScrollLineSp = 23
     )
     ScreenClass.TV_720P -> TVDimensions(
-        arabicTitleSp = 17, cityTitleSp = 14, clockSp = 28, dateSp = 13,
-        prayerArabicSp = 13, prayerBosnianSp = 12,
+        arabicTitleSp = 17, cityTitleSp = 14, clockSp = 28,clockFullSp = 30, dateSp = 13,
+        prayerArabicSp = 13,prayerArabicFullSp = 17, prayerBosnianSp = 12,prayerBosnianFullSp = 16,
         prayerTimeSp = 14, prayerTimeFullSp = 17,
         countdownSp = 10, countdownFullSp = 12,
         loadingTextSp = 13, setupTitleSp = 16, setupBodySp = 12,
@@ -351,7 +354,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Text("مواقيت الصلاة", fontSize = dims.arabicTitleSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
             Text("Vaktija - Mostar", fontSize = dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
-            Text(currentTime, fontSize = dims.clockSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
+            Text(currentTime, fontSize = if (isFullScreen) dims.clockFullSp.sp else dims.clockSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
             Text(currentDate, fontSize = dims.dateSp.sp, color = Color(0xFFB7E4C7))
         }
 
@@ -431,9 +434,9 @@ fun PrayerTimeRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(prayer.arabicName, fontSize = dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                Text("  |  ", fontSize = dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
-                Text(prayer.bosnianName, fontSize = dims.prayerBosnianSp.sp, color = Color(0xFFD8F3DC))
+                Text(prayer.arabicName, fontSize = if (isFullScreen) dims.prayerArabicFullSp.sp else dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("  |  ", fontSize = if (isFullScreen) dims.prayerArabicFullSp.sp else  dims.prayerArabicSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
+                Text(prayer.bosnianName, fontSize = if (isFullScreen) dims.prayerBosnianFullSp.sp else  dims.prayerBosnianSp.sp, color = Color(0xFFD8F3DC))
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) {
                 Text(
