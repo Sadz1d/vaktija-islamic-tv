@@ -79,10 +79,13 @@ fun rememberScreenClass(): ScreenClass {
 
 data class TVDimensions(
     val arabicTitleSp: Int,
+    val arabicTitleFullSp: Int,
     val cityTitleSp: Int,
+    val cityTitleFullSp: Int,
     val clockSp: Int,
     val clockFullSp: Int,
     val dateSp: Int,
+    val dateFullSp: Int,
     val prayerArabicSp: Int,
     val prayerArabicFullSp: Int,
     val prayerBosnianSp: Int,
@@ -108,10 +111,10 @@ data class TVDimensions(
 
 fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
     ScreenClass.TV_4K -> TVDimensions(
-        arabicTitleSp = 36, cityTitleSp = 28, clockSp = 60,clockFullSp = 70, dateSp = 25,
-        prayerArabicSp = 26,prayerArabicFullSp = 32, prayerBosnianSp = 24,prayerBosnianFullSp = 30,
+        arabicTitleSp = 36,arabicTitleFullSp = 40, cityTitleSp = 28,cityTitleFullSp = 32, clockSp = 60,clockFullSp = 70, dateSp = 25,dateFullSp = 30,
+        prayerArabicSp = 26,prayerArabicFullSp = 34, prayerBosnianSp = 24,prayerBosnianFullSp = 30,
         prayerTimeSp = 28, prayerTimeFullSp = 36,
-        countdownSp = 18, countdownFullSp = 24,
+        countdownSp = 18, countdownFullSp = 25,
         loadingTextSp = 24, setupTitleSp = 28, setupBodySp = 18,
         panelPaddingDp = 24, cardSpacingDp = 12,
         cardPaddingHDp = 16, cardPaddingVDp = 10, headerSpacerDp = 24,
@@ -120,7 +123,7 @@ fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
         bosnianScrollSp = 22, bosnianScrollLineSp = 32
     )
     ScreenClass.TV_1080P -> TVDimensions(
-        arabicTitleSp = 20, cityTitleSp = 24, clockSp = 48,clockFullSp = 58, dateSp = 20,
+        arabicTitleSp = 20,arabicTitleFullSp = 25, cityTitleSp = 24,cityTitleFullSp = 27, clockSp = 48,clockFullSp = 58, dateSp = 20,dateFullSp = 25,
         prayerArabicSp = 18,prayerArabicFullSp = 34, prayerBosnianSp = 16,prayerBosnianFullSp = 22,
         prayerTimeSp = 22, prayerTimeFullSp = 30,
         countdownSp = 13, countdownFullSp = 20,
@@ -132,16 +135,16 @@ fun dimensionsFor(screen: ScreenClass): TVDimensions = when (screen) {
         bosnianScrollSp = 15, bosnianScrollLineSp = 23
     )
     ScreenClass.TV_720P -> TVDimensions(
-        arabicTitleSp = 17, cityTitleSp = 14, clockSp = 28,clockFullSp = 30, dateSp = 13,
-        prayerArabicSp = 13,prayerArabicFullSp = 17, prayerBosnianSp = 12,prayerBosnianFullSp = 16,
-        prayerTimeSp = 14, prayerTimeFullSp = 17,
-        countdownSp = 10, countdownFullSp = 12,
-        loadingTextSp = 13, setupTitleSp = 16, setupBodySp = 12,
-        panelPaddingDp = 10, cardSpacingDp = 5,
-        cardPaddingHDp = 8, cardPaddingVDp = 4, headerSpacerDp = 10,
-        scrollCardMaxHeightDp = 110,
-        arabicScrollSp = 13, arabicScrollLineSp = 20,
-        bosnianScrollSp = 11, bosnianScrollLineSp = 17
+        arabicTitleSp = 22,arabicTitleFullSp = 25, cityTitleSp = 24,cityTitleFullSp = 27, clockSp = 48,clockFullSp = 68, dateSp = 22,dateFullSp = 25,
+        prayerArabicSp = 18,prayerArabicFullSp = 34, prayerBosnianSp = 16,prayerBosnianFullSp = 22,
+        prayerTimeSp = 21, prayerTimeFullSp = 30,
+        countdownSp = 13, countdownFullSp = 20,
+        loadingTextSp = 17, setupTitleSp = 21, setupBodySp = 15,
+        panelPaddingDp = 15, cardSpacingDp = 8,
+        cardPaddingHDp = 11, cardPaddingVDp = 7, headerSpacerDp = 15,
+        scrollCardMaxHeightDp = 160,
+        arabicScrollSp = 17, arabicScrollLineSp = 27,
+        bosnianScrollSp = 15, bosnianScrollLineSp = 23
     )
 }
 
@@ -352,10 +355,10 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
 
     Column(modifier = modifier.background(Color(0xFF2D6A4F)).padding(dims.panelPaddingDp.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-            Text("مواقيت الصلاة", fontSize = dims.arabicTitleSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text("Vaktija - Mostar", fontSize = dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
+            Text("مواقيت الصلاة", fontSize = if (isFullScreen) dims.arabicTitleFullSp.sp else dims.arabicTitleSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Vaktija - Mostar", fontSize =if (isFullScreen) dims.cityTitleFullSp.sp else  dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
             Text(currentTime, fontSize = if (isFullScreen) dims.clockFullSp.sp else dims.clockSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
-            Text(currentDate, fontSize = dims.dateSp.sp, color = Color(0xFFB7E4C7))
+            Text(currentDate, fontSize = if (isFullScreen) dims.dateFullSp.sp else dims.dateSp.sp, color = Color(0xFFB7E4C7))
         }
 
         Spacer(modifier = Modifier.height(dims.headerSpacerDp.dp))
