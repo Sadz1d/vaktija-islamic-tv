@@ -42,7 +42,7 @@ class VaktijaAPI {
         }
     }
 
-    suspend fun fetchPrayerTimes(): List<PrayerTime>? {
+    suspend fun fetchPrayerTimes(locationId: Int = 61): List<PrayerTime>? {
         return withContext(Dispatchers.IO) {
             try {
                 val calendar = Calendar.getInstance()
@@ -50,7 +50,7 @@ class VaktijaAPI {
                 val month = calendar.get(Calendar.MONTH) + 1
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-                val url = "https://api.vaktija.ba/vaktija/v1/61/$year/$month/$day"
+                val url = "https://api.vaktija.ba/vaktija/v1/$locationId/$year/$month/$day"
                 Log.d("VaktijaAPI", "Calling URL: $url")
 
                 val request = Request.Builder().url(url).build()

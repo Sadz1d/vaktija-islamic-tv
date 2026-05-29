@@ -33,6 +33,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.clickable
 
 class MainActivity : ComponentActivity(), ImageLoaderFactory {
 
@@ -177,12 +180,136 @@ fun TVApp() {
 // Setup screen
 // ---------------------------------------------------------------------------
 
+val GRADOVI_BIH = listOf(
+    "Banovići" to 0,
+    "Banja Luka" to 1,
+    "Bihać" to 2,
+    "Bijeljina" to 3,
+    "Bileća" to 4,
+    "Bosanski Brod" to 5,
+    "Bosanska Dubica" to 6,
+    "Bosanska Gradiška" to 7,
+    "Bosansko Grahovo" to 8,
+    "Bosanska Krupa" to 9,
+    "Bosanski Novi" to 10,
+    "Bosanski Petrovac" to 11,
+    "Bosanski Šamac" to 12,
+    "Bratunac" to 13,
+    "Brčko" to 14,
+    "Breza" to 15,
+    "Bugojno" to 16,
+    "Busovača" to 17,
+    "Bužim" to 18,
+    "Cazin" to 19,
+    "Čajniče" to 20,
+    "Čapljina" to 21,
+    "Čelić" to 22,
+    "Čelinac" to 23,
+    "Čitluk" to 24,
+    "Derventa" to 25,
+    "Doboj" to 26,
+    "Donji Vakuf" to 27,
+    "Drvar" to 28,
+    "Foča" to 29,
+    "Fojnica" to 30,
+    "Gacko" to 31,
+    "Glamoč" to 32,
+    "Goražde" to 33,
+    "Gornji Vakuf" to 34,
+    "Gračanica" to 35,
+    "Gradačac" to 36,
+    "Grude" to 37,
+    "Hadžići" to 38,
+    "Han-Pijesak" to 39,
+    "Hlivno" to 40,
+    "Ilijaš" to 41,
+    "Jablanica" to 42,
+    "Jajce" to 43,
+    "Kakanj" to 44,
+    "Kalesija" to 45,
+    "Kalinovik" to 46,
+    "Kiseljak" to 47,
+    "Kladanj" to 48,
+    "Ključ" to 49,
+    "Konjic" to 50,
+    "Kotor-Varoš" to 51,
+    "Kreševo" to 52,
+    "Kupres" to 53,
+    "Laktaši" to 54,
+    "Lopare" to 55,
+    "Lukavac" to 56,
+    "Ljubinje" to 57,
+    "Ljubuški" to 58,
+    "Maglaj" to 59,
+    "Modriča" to 60,
+    "Mostar" to 61,
+    "Mrkonjić-Grad" to 62,
+    "Neum" to 63,
+    "Nevesinje" to 64,
+    "Novi Travnik" to 65,
+    "Odžak" to 66,
+    "Olovo" to 67,
+    "Orašje" to 68,
+    "Pale" to 69,
+    "Posušje" to 70,
+    "Prijedor" to 71,
+    "Prnjavor" to 72,
+    "Prozor" to 73,
+    "Rogatica" to 74,
+    "Rudo" to 75,
+    "Sanski Most" to 76,
+    "Sarajevo" to 77,
+    "Skender-Vakuf" to 78,
+    "Sokolac" to 79,
+    "Srbac" to 80,
+    "Srebrenica" to 81,
+    "Srebrenik" to 82,
+    "Stolac" to 83,
+    "Šekovići" to 84,
+    "Šipovo" to 85,
+    "Široki Brijeg" to 86,
+    "Teslić" to 87,
+    "Tešanj" to 88,
+    "Tomislav-Grad" to 89,
+    "Travnik" to 90,
+    "Trebinje" to 91,
+    "Trnovo" to 92,
+    "Tuzla" to 93,
+    "Ugljevik" to 94,
+    "Vareš" to 95,
+    "Velika Kladuša" to 96,
+    "Visoko" to 97,
+    "Višegrad" to 98,
+    "Vitez" to 99,
+    "Vlasenica" to 100,
+    "Zavidovići" to 101,
+    "Zenica" to 102,
+    "Zvornik" to 103,
+    "Žepa" to 104,
+    "Žepče" to 105,
+    "Živinice" to 106,
+    "Bijelo Polje" to 107,
+    "Gusinje" to 108,
+    "Nova Varoš" to 109,
+    "Novi Pazar" to 110,
+    "Plav" to 111,
+    "Pljevlja" to 112,
+    "Priboj" to 113,
+    "Prijepolje" to 114,
+    "Rožaje" to 115,
+    "Sjenica" to 116,
+    "Tutin" to 117
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TVSetupScreen(onConfigured: () -> Unit) {
     val context = LocalContext.current
     val dims = LocalTVDimensions.current
     var dzamijaId by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
+    var selectedGrad by remember { mutableStateOf(GRADOVI_BIH.first { it.second == 61 }) }
+    var dropdownExpanded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFF1B4332)),
@@ -230,11 +357,65 @@ fun TVSetupScreen(onConfigured: () -> Unit) {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+
+
+                    // Umjesto OutlinedTextField, koristi Button
+                    Button(
+                        onClick = { dropdownExpanded = !dropdownExpanded },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B4332)),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF40916C)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Grad: ${selectedGrad.first}",
+                            color = Color.White,
+                            fontSize = dims.setupBodySp.sp,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+
+                    if (dropdownExpanded) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D6A4F))
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 200.dp)
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                GRADOVI_BIH.forEach { grad ->
+                                    Button(
+                                        onClick = { selectedGrad = grad; dropdownExpanded = false },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (grad == selectedGrad) Color(0xFF40916C) else Color.Transparent
+                                        ),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = grad.first,
+                                            color = Color.White,
+                                            fontSize = dims.setupBodySp.sp,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.Start
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                 if (error != null) Text(error!!, color = Color(0xFFFFE66D), fontSize = 14.sp)
                 Button(
                     onClick = {
                         if (dzamijaId.isBlank()) error = "ID džemata ne može biti prazan"
-                        else { TVDzamatConfig.saveDzamijaId(context, dzamijaId); onConfigured() }
+                        else {
+                            TVDzamatConfig.saveDzamijaId(context, dzamijaId)
+                            TVDzamatConfig.saveLocation(context, selectedGrad.second, selectedGrad.first)
+                            onConfigured()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF40916C)),
                     modifier = Modifier.fillMaxWidth()
@@ -279,7 +460,10 @@ fun SplitScreenDisplay() {
 
 @Composable
 fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = false) {
+    val context = LocalContext.current
     val dims = LocalTVDimensions.current
+    val locationId = remember { TVDzamatConfig.getLocationId(context) }
+    val cityName = remember { TVDzamatConfig.getCityName(context) }
     var currentTime by remember { mutableStateOf(getCurrentTime()) }
     var currentDate by remember { mutableStateOf(getCurrentDateBosnian()) }
     var prayerTimes by remember { mutableStateOf<List<PrayerTime>>(emptyList()) }
@@ -326,7 +510,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
             }.timeInMillis
             if (lastSuccessfulFetch < todayMidnight) {
                 try {
-                    val newTimes = api.fetchPrayerTimes()
+                    val newTimes = api.fetchPrayerTimes(locationId)
                     if (newTimes != null) {
                         prayerTimes = newTimes
                         lastSuccessfulFetch = System.currentTimeMillis()
@@ -356,7 +540,7 @@ fun PrayerTimesPanel(modifier: Modifier = Modifier, isFullScreen: Boolean = fals
     Column(modifier = modifier.background(Color(0xFF2D6A4F)).padding(dims.panelPaddingDp.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Text("مواقيت الصلاة", fontSize = if (isFullScreen) dims.arabicTitleFullSp.sp else dims.arabicTitleSp.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text("Vaktija - Mostar", fontSize =if (isFullScreen) dims.cityTitleFullSp.sp else  dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
+            Text("Vaktija - $cityName", fontSize =if (isFullScreen) dims.cityTitleFullSp.sp else  dims.cityTitleSp.sp, fontWeight = FontWeight.Medium, color = Color(0xFFB7E4C7))
             Text(currentTime, fontSize = if (isFullScreen) dims.clockFullSp.sp else dims.clockSp.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD8F3DC))
             Text(currentDate, fontSize = if (isFullScreen) dims.dateFullSp.sp else dims.dateSp.sp, color = Color(0xFFB7E4C7))
         }

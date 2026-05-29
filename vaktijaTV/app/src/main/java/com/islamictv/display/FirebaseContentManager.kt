@@ -19,33 +19,7 @@ data class ContentItem(
     var imageUrl: String = ""
 )
 
-/**
- * Manages which džemat this TV screen belongs to.
- * The ID is entered once on first launch and saved locally.
- */
-object TVDzamatConfig {
-    private const val PREFS_NAME = "tv_config"
-    private const val KEY_DZAMIJA_ID = "dzamija_id"
 
-    fun getDzamijaId(context: Context): String? {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_DZAMIJA_ID, null)
-    }
-
-    fun saveDzamijaId(context: Context, id: String) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_DZAMIJA_ID, id.trim().lowercase())
-            .apply()
-    }
-
-    fun isConfigured(context: Context): Boolean = getDzamijaId(context) != null
-
-    fun clear(context: Context) {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit().clear().apply()
-    }
-}
 
 class FirebaseContentManager(private val dzamijaId: String) {
 
