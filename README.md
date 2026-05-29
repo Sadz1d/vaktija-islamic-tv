@@ -152,6 +152,12 @@ On first launch, the TV app shows a one-time setup screen asking for the **mosqu
 ---
 
 ## Screenshots
+<img width="1193" height="663" alt="loginTV" src="https://github.com/user-attachments/assets/76c53f75-f106-4e85-b953-5dcf948fcb6c" />
+<img width="1199" height="679" alt="vaktijaSplitScreenTV" src="https://github.com/user-attachments/assets/270266e7-efa2-40a0-bb68-5842090a0448" />
+<img width="705" height="393" alt="vaktijaFullScreenTV" src="https://github.com/user-attachments/assets/ec0671e5-e7d9-4865-ac47-bfad154aae01" />
+<img width="738" height="1599" alt="viber_image_2026-05-30_01-31-15-007" src="https://github.com/user-attachments/assets/41d774f1-01b9-41b3-b2c8-609adcd8fc66" />
+<img width="738" height="1599" alt="viber_image_2026-05-30_01-31-15-181" src="https://github.com/user-attachments/assets/22081c34-f782-4592-b2ed-776b6f870c00" />
+<img width="738" height="1599" alt="viber_image_2026-05-30_01-31-15-111" src="https://github.com/user-attachments/assets/85b28933-3276-4942-bba6-540dbf458580" />
 
 *Coming soon*
 
