@@ -157,9 +157,6 @@ On first launch, the TV app shows a one-time setup screen asking for the **mosqu
 <img width="1199" height="679" alt="vaktijaSplitScreenTV" src="https://github.com/user-attachments/assets/270266e7-efa2-40a0-bb68-5842090a0448" />
 <img width="705" height="393" alt="vaktijaFullScreenTV" src="https://github.com/user-attachments/assets/ec0671e5-e7d9-4865-ac47-bfad154aae01" />
 
-
-*Coming soon*
-
 ---
 
 ## Author
